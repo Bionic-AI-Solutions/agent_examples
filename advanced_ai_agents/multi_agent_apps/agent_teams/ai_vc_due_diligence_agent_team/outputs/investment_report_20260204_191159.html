@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Due Diligence Report - SpaceX</title>
+    <style>
+        :root {
+            --primary-blue: #1a365d;
+            --accent-gold: #d4af37;
+            --text-gray: #4a5568;
+            --border-light: #e2e8f0;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Candara, 'Bitstream Vera Sans', 'DejaVu Sans', 'Bitstream Vera Sans', 'Trebuchet MS', Verdana, 'Verdana Ref', sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 60px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--primary-blue);
+        }
+
+        header {
+            border-bottom: 2px solid var(--accent-gold);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        .confidential-tag {
+            color: #c53030;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 2.2rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .memo-meta {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+
+        .memo-meta div:nth-child(odd) {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        section {
+            margin-top: 40px;
+        }
+
+        h2 {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 10px 15px;
+            font-size: 1.3rem;
+            border-left: 6px solid var(--accent-gold);
+            text-transform: uppercase;
+        }
+
+        h3 {
+            color: var(--primary-blue);
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 5px;
+            margin-top: 25px;
+        }
+
+        .summary-box {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            padding: 25px;
+            border-radius: 4px;
+        }
+
+        .recommendation-tag {
+            display: inline-block;
+            background: #276749;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: var(--primary-blue);
+            color: white;
+            text-align: left;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.95rem;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+
+        .risk-meter {
+            background: #eee;
+            height: 20px;
+            width: 100%;
+            border-radius: 10px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .risk-fill {
+            background: linear-gradient(to right, #48bb78, #ecc94b, #f56565);
+            height: 100%;
+            width: 70%; /* 7/10 */
+            border-radius: 10px;
+        }
+
+        .highlight-gold {
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; margin: 0; width: 100%; max-width: none; padding: 20px; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="confidential-tag">Confidential & Proprietary</div>
+        <h1>Investment Committee Memorandum</h1>
+        <div class="memo-meta">
+            <div>TO:</div><div>Investment Committee</div>
+            <div>FROM:</div><div>InvestorMemoAgent (Senior Partner)</div>
+            <div>DATE:</div><div><strong>February 04, 2026</strong></div>
+            <div>SUBJECT:</div><div>Investment Opportunity in Space Exploration Technologies Corp. (SpaceX)</div>
+        </div>
+    </header>
+
+    <section id="executive-summary">
+        <h2>1. Executive Summary</h2>
+        <div class="summary-box">
+            <p><strong>DATE: February 04, 2026</strong></p>
+            <p><strong>Company:</strong> SpaceX is the world’s dominant aerospace manufacturer and space transportation company, now scaling the largest global satellite internet constellation (Starlink).</p>
+            <p><strong>Recommendation:</strong> <span class="recommendation-tag">BUY</span></p>
+            
+            <ul>
+                <li><strong>De Facto Monopoly:</strong> SpaceX controls ~80% of global launch upmass. Competitors remain years behind on reusability and unit economics.</li>
+                <li><strong>Revenue Pivot:</strong> Shifted from cyclical launch contracts to high-margin recurring broadband revenue (Starlink), projected to hit ~$14B total revenue in 2024 (historical baseline).</li>
+                <li><strong>Technical Moat:</strong> Starship Flight 4 success demonstrates a path to commoditizing space transport at <span class="highlight-gold">&lt;$100/kg</span>.</li>
+                <li><strong>Liquidity Path:</strong> Expected Starlink spinoff IPO (2025–2027) provides a clear valuation markup event.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="company-overview">
+        <h2>2. Company Overview</h2>
+        <p>Founded in 2002 by Elon Musk, SpaceX has revolutionized the cost structure of access to orbit through vertical integration and rocket reusability.</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h3>Leadership</h3>
+                <ul>
+                    <li><strong>Elon Musk (CEO/CTO):</strong> Technical architect; holds ~79% voting control.</li>
+                    <li><strong>Gwynne Shotwell (President/COO):</strong> Operational lead handling execution and government relations.</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Product Portfolio</h3>
+                <ul>
+                    <li><strong>Falcon 9:</strong> Reusable industry workhorse.</li>
+                    <li><strong>Starlink:</strong> LEO internet (3M+ subscribers).</li>
+                    <li><strong>Starship:</strong> Next-gen super-heavy lift.</li>
+                    <li><strong>Starshield:</strong> Defense-grade satellite secure networks.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="market-opportunity">
+        <h2>3. Market Opportunity & Funding</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Current Data Point</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Current Status</td>
+                    <td>Late-stage Private</td>
+                </tr>
+                <tr>
+                    <td>Last Known Valuation (June 2024)</td>
+                    <td>~$210 Billion</td>
+                </tr>
+                <tr>
+                    <td><strong>Target Valuation (Current Round)</strong></td>
+                    <td><strong>$250 Billion – $300 Billion</strong></td>
+                </tr>
+                <tr>
+                    <td>Implied Multiple</td>
+                    <td>15x - 18x Forward Revenue</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Total Addressable Market (TAM)</h3>
+        <ul>
+            <li><strong>Launch Services:</strong> Projected ~$41B by 2030. SpaceX captures majority market share.</li>
+            <li><strong>Satellite Broadband:</strong> Projected ~$55B+ by 2032. Critical for maritime, aviation, and rural sectors.</li>
+        </ul>
+    </section>
+
+    <section id="financial-analysis">
+        <h2>4. Financial Analysis</h2>
+        <p>Financial performance is increasingly driven by Starlink's recurring revenue model rather than one-off launch contracts.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fiscal Year</th>
+                    <th>Revenue (Est.)</th>
+                    <th>YoY Growth</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2023 (Actual)</td>
+                    <td>$8.7 Billion</td>
+                    <td>--</td>
+                </tr>
+                <tr>
+                    <td>2024 (Estimate)</td>
+                    <td>$13.1B – $15.0B</td>
+                    <td>~60%</td>
+                </tr>
+                <tr>
+                    <td><strong>2029 (Projected)</strong></td>
+                    <td><strong>$44.0 Billion</strong></td>
+                    <td><strong>Base Case</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>*Starlink is currently reported to be cash-flow positive. The shift to "Direct-to-Cell" high-margin B2B revenue is the primary upcoming profitability driver.</em></p>
+    </section>
+
+    <section id="risk-assessment">
+        <h2>5. Risk Analysis</h2>
+        <p><strong>Overall Risk Score: 7/10 (High Execution Risk)</strong></p>
+        <div class="risk-meter"><div class="risk-fill"></div></div>
+        
+        <ul>
+            <li><strong>Starship Dependency:</strong> Starlink V2 capacity expansion requires Starship. Technical delays in Starship development pose a hard ceiling on Starlink revenue growth.</li>
+            <li><strong>Key Man Risk:</strong> 79% voting control rests with Elon Musk. His public profile and multi-company commitments pose governance and federal contract risks.</li>
+            <li><strong>Competitive Pressure:</strong> Amazon Project Kuiper remains the only threat with the capital to engage in a sustained price war.</li>
+        </ul>
+    </section>
+
+    <section id="recommendation">
+        <h2>6. Investment Recommendation</h2>
+        <p><strong>Verdict: Participate in Tender Offer (BUY)</strong></p>
+        <p>The thesis rests on SpaceX evolving from a "Rocket Company" into a "Global Utility." At a $250B+ valuation, the asset is priced for perfection, yet remains a generational infrastructure play with no direct peer.</p>
+        
+        <h3>Required Next Steps:</h3>
+        <ol>
+            <li><strong>Portfolio Weighting:</strong> Limit position size to &lt;10% of late-stage allocation.</li>
+            <li><strong>Terms:</strong> Negotiate for <strong>pro-rata rights</strong> in future Starlink spinoff entities.</li>
+            <li><strong>Final Diligence:</strong> Audit Starlink subscriber churn rates and Starship Raptor engine production yields before capital deployment.</li>
+        </ol>
+    </section>
+
+    <footer style="margin-top: 50px; border-top: 1px solid var(--border-light); padding-top: 20px; font-size: 0.8rem; color: #718096; text-align: center;">
+        FOR INTERNAL USE ONLY — PREPARED FEBRUARY 04, 2026 — SUBJECT TO FIRM COMPLIANCE POLICIES
+    </footer>
+</div>
+
+</body>
+</html>

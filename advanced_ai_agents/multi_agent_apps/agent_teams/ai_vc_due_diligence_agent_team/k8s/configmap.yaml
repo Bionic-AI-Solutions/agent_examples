@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vc-diligence-config
+  namespace: vc-diligence
+data:
+  POSTGRES_DB: "vc_diligence"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  BACKEND_URL: "http://backend-service:8000"
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"

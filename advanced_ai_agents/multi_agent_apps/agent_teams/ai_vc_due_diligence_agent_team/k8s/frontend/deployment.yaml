@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: vc-diligence
+  labels:
+    app: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      imagePullSecrets:
+      - name: dockerhub-pull-secret
+      containers:
+      - name: frontend
+        image: docker4zerocool/vc-diligence-frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vc-diligence-secrets
+              key: GOOGLE_API_KEY
+        - name: BACKEND_URL
+          valueFrom:
+            configMapKeyRef:
+              name: vc-diligence-config
+              key: BACKEND_URL
+        - name: PORT
+          value: "8080"
+        - name: HOST
+          value: "0.0.0.0"
+        - name: ADK_FORCE_LOCAL_STORAGE
+          value: "1"
+        volumeMounts:
+        - name: adk-storage
+          mountPath: /agents/.adk
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: adk-storage
+        persistentVolumeClaim:
+          claimName: adk-storage-pvc

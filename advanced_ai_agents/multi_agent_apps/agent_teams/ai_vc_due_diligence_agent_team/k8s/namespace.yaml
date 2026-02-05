@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vc-diligence
+  labels:
+    name: vc-diligence
+    app: vc-due-diligence

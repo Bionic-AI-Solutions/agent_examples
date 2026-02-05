@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vc-diligence-ingress
+  namespace: vc-diligence
+  annotations:
+    konghq.com/strip-path: "false"
+    konghq.com/protocols: "https,http"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Optional: Rate limiting
+    # konghq.com/plugins: "vc-rate-limit"
+spec:
+  ingressClassName: kong
+  tls:
+  - hosts:
+    - vc.baisoln.com
+    secretName: vc-diligence-tls  # cert-manager will create this automatically
+  rules:
+  - host: vc.baisoln.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 8080
+---
+# Optional: Kong rate limiting plugin
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: vc-rate-limit
+  namespace: vc-diligence
+plugin: rate-limiting
+config:
+  minute: 20
+  hour: 1000
+  policy: local
