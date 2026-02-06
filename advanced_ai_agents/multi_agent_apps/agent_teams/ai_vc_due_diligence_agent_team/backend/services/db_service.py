@@ -23,7 +23,11 @@ async def initialize_db_pool():
         logger.warning("DATABASE_URL not set - database features disabled")
         return
 
-    logger.info(f"Initializing database connection pool")
+    # Railway provides postgresql:// but SQLAlchemy async needs postgresql+asyncpg://
+    if database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+    logger.info("Initializing database connection pool")
 
     _engine = create_async_engine(
         database_url,
