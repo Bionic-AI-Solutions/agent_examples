@@ -7,15 +7,11 @@ const ALLOWED_DOMAINS = ['bionicaisolutions.com', 'zippio.ai', 'gmail.com'] // U
 
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
-    const { userId, sessionClaims } = await auth()
+    // Protect the route - this will redirect to sign-in if not authenticated
+    await auth.protect()
 
-    // Require authentication
-    if (!userId) {
-      await auth.protect()
-      return
-    }
-
-    // Check if user's email domain is allowed
+    // At this point, user is authenticated - check email domain
+    const { sessionClaims } = await auth()
     const email = sessionClaims?.email as string | undefined
 
     if (email) {
