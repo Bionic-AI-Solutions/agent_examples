@@ -1,0 +1,10 @@
+.venv
+.cache
+__pycache__
+outputs
+.adk
+*.pyc
+.git
+.env
+k8s
+node_modules
