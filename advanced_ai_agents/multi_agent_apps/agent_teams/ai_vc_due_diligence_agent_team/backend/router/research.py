@@ -1,8 +1,10 @@
 """Research API Router - Endpoints for VC due diligence research"""
 
 import asyncio
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException, Response, status, Depends
 from loguru import logger
+
+from services.auth_service import get_current_user, is_auth_enabled
 
 from models.research_request import (
     ResearchRequest,
@@ -14,6 +16,7 @@ from models.research_request import (
 from models.research_task import TaskStatus
 from services.research_service import ResearchService
 from services.artifact_service import ArtifactService
+from services.report_delivery_service import ReportDeliveryService
 from repository.research_task_repository import (
     create_research_task,
     update_task_status,
@@ -26,6 +29,7 @@ router = APIRouter(prefix="/api/research", tags=["Research"])
 # Initialize services
 research_service = ResearchService()
 artifact_service = ArtifactService()
+report_delivery_service = ReportDeliveryService()
 
 
 @router.post(
@@ -35,8 +39,11 @@ artifact_service = ArtifactService()
     summary="Start new due diligence research",
     description="Triggers a new VC due diligence research task. Returns task ID for status polling.",
 )
-async def trigger_research(request: ResearchRequest):
-    """Start a new company research task"""
+async def trigger_research(
+    request: ResearchRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Start a new company research task (requires authentication)"""
     try:
         logger.info(
             f"Received research request for: {request.company_name}"
@@ -82,12 +89,41 @@ async def trigger_research(request: ResearchRequest):
                             f"No artifacts generated for task {task.task_id}"
                         )
 
+                    # Generate PDF report and send email
+                    email_sent = False
+                    if saved_artifacts:
+                        logger.info(f"Generating PDF report for task {task.task_id}")
+                        await update_task_status(
+                            task_id=str(task.task_id),
+                            status=TaskStatus.IN_PROGRESS,
+                            current_stage="Generating PDF report and sending email",
+                        )
+
+                        delivery_result = await report_delivery_service.deliver_report(
+                            task_id=str(task.task_id),
+                            company_name=request.company_name,
+                            artifacts=saved_artifacts,
+                            recipient_email=request.email_recipient,
+                        )
+
+                        # Add PDF to artifacts if generated
+                        if delivery_result.get("pdf_generated"):
+                            saved_artifacts["pdf_report"] = delivery_result["pdf_filename"]
+
+                        email_sent = delivery_result.get("email_sent", False)
+
+                        if delivery_result.get("error"):
+                            logger.warning(f"Report delivery issue: {delivery_result['error']}")
+
                     # Update task to success
                     await update_task_status(
                         task_id=str(task.task_id),
                         status=TaskStatus.SUCCESS,
                         current_stage="Research completed",
-                        output_data={"messages": result.get("messages", [])},
+                        output_data={
+                            "messages": result.get("messages", []),
+                            "email_sent": email_sent,
+                        },
                         artifacts=saved_artifacts,
                     )
 
@@ -142,8 +178,11 @@ async def trigger_research(request: ResearchRequest):
     description="Polls the status of a research task. Use for monitoring progress.",
     responses={404: {"model": ErrorResponse}},
 )
-async def get_research_status(task_id: str):
-    """Poll task status"""
+async def get_research_status(
+    task_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Poll task status (requires authentication)"""
     task = await get_task_by_id(task_id)
 
     if not task:
@@ -152,11 +191,17 @@ async def get_research_status(task_id: str):
             detail=f"Task not found: {task_id}",
         )
 
+    # Extract email_sent from output_data if available
+    email_sent = None
+    if task.output_data and isinstance(task.output_data, dict):
+        email_sent = task.output_data.get("email_sent")
+
     return TaskStatusResponse(
         task_id=str(task.task_id),
         status=task.status.value,
         current_stage=task.current_stage,
         artifacts=task.artifacts,
+        email_sent=email_sent,
         error_message=task.error_message,
         created_at=task.created_at,
         completed_at=task.completed_at,
@@ -172,8 +217,12 @@ async def get_research_status(task_id: str):
         404: {"model": ErrorResponse},
     },
 )
-async def get_artifact(task_id: str, filename: str):
-    """Download artifact file"""
+async def get_artifact(
+    task_id: str,
+    filename: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Download artifact file (requires authentication)"""
     try:
         # Verify task exists
         task = await get_task_by_id(task_id)
@@ -193,6 +242,8 @@ async def get_artifact(task_id: str, filename: str):
             media_type = "image/png"
         elif filename.endswith(".jpg") or filename.endswith(".jpeg"):
             media_type = "image/jpeg"
+        elif filename.endswith(".pdf"):
+            media_type = "application/pdf"
         else:
             media_type = "application/octet-stream"
 
@@ -223,23 +274,34 @@ async def get_artifact(task_id: str, filename: str):
     summary="Get research history",
     description="Retrieve list of past research tasks",
 )
-async def get_research_history(limit: int = 50, offset: int = 0):
-    """List past research tasks"""
+async def get_research_history(
+    limit: int = 50,
+    offset: int = 0,
+    current_user: dict = Depends(get_current_user),
+):
+    """List past research tasks (requires authentication)"""
     try:
         tasks = await get_all_tasks(limit=limit, offset=offset)
 
-        task_responses = [
-            TaskStatusResponse(
-                task_id=str(task.task_id),
-                status=task.status.value,
-                current_stage=task.current_stage,
-                artifacts=task.artifacts,
-                error_message=task.error_message,
-                created_at=task.created_at,
-                completed_at=task.completed_at,
+        task_responses = []
+        for task in tasks:
+            # Extract email_sent from output_data if available
+            email_sent = None
+            if task.output_data and isinstance(task.output_data, dict):
+                email_sent = task.output_data.get("email_sent")
+
+            task_responses.append(
+                TaskStatusResponse(
+                    task_id=str(task.task_id),
+                    status=task.status.value,
+                    current_stage=task.current_stage,
+                    artifacts=task.artifacts,
+                    email_sent=email_sent,
+                    error_message=task.error_message,
+                    created_at=task.created_at,
+                    completed_at=task.completed_at,
+                )
             )
-            for task in tasks
-        ]
 
         return ResearchHistoryResponse(
             tasks=task_responses, total=len(task_responses)

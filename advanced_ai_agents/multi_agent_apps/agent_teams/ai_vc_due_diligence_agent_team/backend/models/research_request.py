@@ -20,12 +20,18 @@ class ResearchRequest(BaseModel):
         description="Optional URL of the company website",
         examples=["https://agno.com", "https://lovable.dev"],
     )
+    email_recipient: Optional[str] = Field(
+        None,
+        description="Email address to send the PDF report to. Overrides the default REPORT_EMAIL_RECIPIENT.",
+        examples=["analyst@vcfirm.com", "team@acme.vc"],
+    )
 
     class Config:
         json_schema_extra = {
             "example": {
                 "company_name": "Agno AI",
                 "company_url": "https://agno.com",
+                "email_recipient": "analyst@vcfirm.com",
             }
         }
 
@@ -70,14 +76,19 @@ class TaskStatusResponse(BaseModel):
     )
     artifacts: Optional[Dict[str, str]] = Field(
         None,
-        description="Available artifacts (chart, report, infographic)",
+        description="Available artifacts (chart, report, infographic, pdf_report)",
         examples=[
             {
                 "chart": "revenue_chart_20260204_123456.png",
                 "report": "investment_report_20260204_123456.html",
                 "infographic": "infographic_20260204_123456.png",
+                "pdf_report": "Agno_AI_DD_Report_20260204_123456.pdf",
             }
         ],
+    )
+    email_sent: Optional[bool] = Field(
+        None,
+        description="Whether the PDF report was emailed successfully",
     )
     error_message: Optional[str] = Field(
         None, description="Error message if status is error"

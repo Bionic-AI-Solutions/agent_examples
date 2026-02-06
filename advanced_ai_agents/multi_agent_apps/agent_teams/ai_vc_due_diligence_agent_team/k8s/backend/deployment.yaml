@@ -21,7 +21,7 @@ spec:
       - name: migration
         # IMPORTANT: Replace 'your-dockerhub-username' with your actual Docker Hub username
         image: docker4zerocool/vc-diligence-backend:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command: ['sh', '-c']
         args:
           - |
@@ -60,7 +60,7 @@ spec:
       - name: backend
         # IMPORTANT: Replace 'your-dockerhub-username' with your actual Docker Hub username
         image: docker4zerocool/vc-diligence-backend:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
           name: http
@@ -89,6 +89,38 @@ spec:
             configMapKeyRef:
               name: vc-diligence-config
               key: LOG_LEVEL
+        # Email Configuration (Gmail SMTP Relay)
+        - name: REPORT_EMAIL_RECIPIENT
+          valueFrom:
+            secretKeyRef:
+              name: vc-diligence-secrets
+              key: REPORT_EMAIL_RECIPIENT
+        - name: EMAIL_FROM_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: vc-diligence-secrets
+              key: EMAIL_FROM_ADDRESS
+        - name: SMTP_HOST
+          valueFrom:
+            secretKeyRef:
+              name: vc-diligence-secrets
+              key: SMTP_HOST
+        - name: SMTP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: vc-diligence-secrets
+              key: SMTP_PORT
+        # Clerk Authentication
+        - name: CLERK_ISSUER
+          valueFrom:
+            secretKeyRef:
+              name: vc-diligence-secrets
+              key: CLERK_ISSUER
+        - name: CLERK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vc-diligence-secrets
+              key: CLERK_SECRET_KEY
         volumeMounts:
         - name: artifacts
           mountPath: /app/artifacts

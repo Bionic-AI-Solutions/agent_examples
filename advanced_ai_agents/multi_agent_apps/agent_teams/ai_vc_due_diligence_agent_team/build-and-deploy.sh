@@ -69,20 +69,49 @@ echo -e "${GREEN}✓ Frontend image pushed successfully${NC}"
 # Deploy to Kubernetes
 print_section "Deploying to Kubernetes"
 
-# Apply PVCs first (if they don't exist)
-echo "Ensuring persistent volumes are created..."
-kubectl apply -f k8s/frontend/pvc.yaml 2>/dev/null || echo "PVC already exists"
-kubectl apply -f k8s/backend/pvc.yaml 2>/dev/null || echo "Backend PVC already exists"
+# Apply namespace
+echo "Ensuring namespace exists..."
+kubectl apply -f k8s/namespace.yaml 2>/dev/null || echo "Namespace already exists"
 
-# Restart backend deployment
+# Apply secrets and configmap (includes email SMTP + Clerk auth config)
+echo "Applying secrets and configmap..."
+kubectl apply -f k8s/secret.yaml || handle_error "Secret apply failed"
+kubectl apply -f k8s/configmap.yaml || handle_error "ConfigMap apply failed"
+echo -e "${GREEN}✓ Secrets and configmap applied${NC}"
+
+# Apply PVCs (if they don't exist)
+echo "Ensuring persistent volumes are created..."
+kubectl apply -f k8s/frontend/pvc.yaml 2>/dev/null || echo "Frontend PVC already exists"
+kubectl apply -f k8s/backend/pvc.yaml 2>/dev/null || echo "Backend PVC already exists"
+kubectl apply -f k8s/postgres/pvc.yaml 2>/dev/null || echo "Postgres PVC already exists"
+
+# Apply services
+echo "Applying services..."
+kubectl apply -f k8s/backend/service.yaml || handle_error "Backend service apply failed"
+kubectl apply -f k8s/frontend/service.yaml || handle_error "Frontend service apply failed"
+kubectl apply -f k8s/postgres/service.yaml 2>/dev/null || echo "Postgres service already exists"
+
+# Apply deployments (picks up new env vars, image references, etc.)
+echo "Applying deployments..."
+kubectl apply -f k8s/postgres/deployment.yaml || handle_error "Postgres deployment apply failed"
+kubectl apply -f k8s/backend/deployment.yaml || handle_error "Backend deployment apply failed"
+kubectl apply -f k8s/frontend/deployment.yaml || handle_error "Frontend deployment apply failed"
+echo -e "${GREEN}✓ Deployments applied${NC}"
+
+# Apply ingress (if exists)
+if [ -d "k8s/ingress" ]; then
+    echo "Applying ingress..."
+    kubectl apply -f k8s/ingress/ 2>/dev/null || echo "Ingress apply skipped"
+fi
+
+# Restart deployments to pick up new images
 echo "Restarting backend deployment..."
 kubectl rollout restart deployment/backend -n ${NAMESPACE} || handle_error "Backend rollout failed"
 echo -e "${GREEN}✓ Backend deployment restarted${NC}"
 
-# Delete frontend pods to force pull new image (since imagePullPolicy is Always)
 echo "Restarting frontend deployment..."
-kubectl delete pods -n ${NAMESPACE} -l app=frontend || handle_error "Frontend pod deletion failed"
-echo -e "${GREEN}✓ Frontend pods deleted${NC}"
+kubectl rollout restart deployment/frontend -n ${NAMESPACE} || handle_error "Frontend rollout failed"
+echo -e "${GREEN}✓ Frontend deployment restarted${NC}"
 
 # Wait for deployments to be ready
 print_section "Waiting for Deployments"

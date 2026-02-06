@@ -20,7 +20,7 @@ spec:
       containers:
       - name: frontend
         image: docker4zerocool/vc-diligence-frontend:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
           name: http
@@ -41,6 +41,11 @@ spec:
           value: "0.0.0.0"
         - name: ADK_FORCE_LOCAL_STORAGE
           value: "1"
+        - name: CLERK_PUBLISHABLE_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: vc-diligence-config
+              key: CLERK_PUBLISHABLE_KEY
         volumeMounts:
         - name: adk-storage
           mountPath: /agents/.adk

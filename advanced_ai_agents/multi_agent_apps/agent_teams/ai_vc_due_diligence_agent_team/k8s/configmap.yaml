@@ -10,3 +10,7 @@ data:
   BACKEND_URL: "http://backend-service:8000"
   ENVIRONMENT: "production"
   LOG_LEVEL: "INFO"
+
+  # Clerk Authentication (publishable key is public, safe for configmap)
+  # Frontend uses this to initialize Clerk
+  CLERK_PUBLISHABLE_KEY: "pk_test_xxxxxxxxxxxxxxxxxxxxx"  # REPLACE with your Clerk publishable key

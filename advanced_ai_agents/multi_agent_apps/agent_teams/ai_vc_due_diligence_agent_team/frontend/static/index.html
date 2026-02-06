@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="AI VC Due Diligence Agent - Mobile-Friendly Investment Analysis">
+    <meta name="theme-color" content="#305f9d">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VC Diligence">
+
+    <title>AI VC Due Diligence Agent</title>
+
+    <!-- Clerk Configuration -->
+    <!-- Set your Clerk publishable key here or via environment variable substitution -->
+    <meta name="clerk-publishable-key" content="pk_test_aHVtYmxlLWxvdXNlLTk2LmNsZXJrLmFjY291bnRzLmRldiQ">
+
+    <!-- Clerk Authentication Script (loaded dynamically) -->
+
+    <!-- Mobile-Responsive CSS -->
+    <link rel="stylesheet" href="/static/mobile-responsive.css">
+
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        /* Container for the entire app */
+        #app-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Mobile header */
+        #mobile-header {
+            display: none;
+            background: #305f9d;
+            color: white;
+            padding: 12px 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        #mobile-header h1 {
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Main content iframe */
+        #adk-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Mobile menu toggle button */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 16px;
+            z-index: 1001;
+            background: #305f9d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 48px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .menu-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .menu-toggle:hover {
+            background: #0f4784;
+        }
+
+        /* Info banner for mobile users */
+        .mobile-info {
+            display: none;
+            background: #d5e3ff;
+            color: #202124;
+            padding: 8px 16px;
+            font-size: 14px;
+            text-align: center;
+            border-bottom: 1px solid #a7c8ff;
+        }
+
+        .mobile-info a {
+            color: #305f9d;
+            text-decoration: underline;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #ffffff;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #305f9d;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile-specific styles */
+        @media only screen and (max-width: 768px) {
+            #mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .mobile-info {
+                display: block;
+            }
+
+            body {
+                background: #f8f9fa;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #131314;
+            }
+
+            #mobile-header {
+                background: #1b1b1b;
+                border-bottom: 1px solid #444746;
+            }
+
+            .mobile-info {
+                background: #2b2b2f;
+                color: #e8eaed;
+                border-bottom-color: #444746;
+            }
+
+            .mobile-info a {
+                color: #8ab4f8;
+            }
+
+            .loading {
+                background: #131314;
+            }
+        }
+
+        /* Landscape orientation warning on small devices */
+        @media only screen and (max-height: 500px) and (max-width: 768px) and (orientation: landscape) {
+            .orientation-warning {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                z-index: 2000;
+                text-align: center;
+                padding: 20px;
+            }
+        }
+
+        /* Auth container styles */
+        #auth-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+            padding: 20px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .auth-logo {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 0.15em;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .auth-title {
+            font-size: 20px;
+            font-weight: 300;
+            margin: 0;
+        }
+
+        #clerk-sign-in {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+            min-width: 300px;
+        }
+
+        .auth-footer {
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* User profile button (when signed in) */
+        #user-button {
+            position: fixed;
+            top: 12px;
+            right: 16px;
+            z-index: 1002;
+        }
+
+        @media only screen and (max-width: 768px) {
+            #user-button {
+                top: 10px;
+                right: 10px;
+            }
+
+            .auth-header {
+                margin-bottom: 20px;
+            }
+
+            .auth-logo {
+                font-size: 22px;
+            }
+
+            .auth-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth container (shown when not signed in) -->
+    <div id="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo">VC DILIGENCE</div>
+            <h1 class="auth-title">AI-Powered Investment Analysis</h1>
+        </div>
+        <div id="clerk-sign-in"></div>
+        <div class="auth-footer">
+            Secure authentication powered by Clerk
+        </div>
+    </div>
+
+    <!-- Main app container (shown when signed in) -->
+    <div id="main-app" style="display: none;">
+        <!-- User profile button -->
+        <div id="user-button"></div>
+
+        <!-- Mobile header -->
+        <div id="mobile-header">
+            <h1>VC Due Diligence</h1>
+        </div>
+
+        <!-- Mobile info banner -->
+        <div class="mobile-info">
+            Chat interface optimized for mobile. Swipe or tap menu to view trace details.
+        </div>
+
+        <!-- App container -->
+    <div id="app-container">
+        <!-- Loading indicator -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- ADK Interface iframe - will be populated dynamically -->
+        <iframe
+            id="adk-frame"
+            src="/adk-ui"
+            title="AI VC Due Diligence Agent Interface"
+            allow="clipboard-read; clipboard-write"
+            style="display: none;"
+        ></iframe>
+    </div>
+
+        <!-- Mobile menu toggle -->
+        <button
+            class="menu-toggle"
+            id="menu-toggle"
+            aria-label="Toggle trace panel"
+            title="View trace details">
+            ☰
+        </button>
+    </div><!-- End main-app -->
+
+    <script>
+        // Clerk authentication and mobile optimization script
+        (function() {
+            'use strict';
+
+            const authContainer = document.getElementById('auth-container');
+            const mainApp = document.getElementById('main-app');
+            const iframe = document.getElementById('adk-frame');
+            const loading = document.getElementById('loading');
+            const menuToggle = document.getElementById('menu-toggle');
+
+            // Store auth token globally for API calls
+            window.clerkToken = null;
+
+            // Load Clerk script dynamically
+            function loadClerkScript() {
+                const metaTag = document.querySelector('meta[name="clerk-publishable-key"]');
+                const publishableKey = metaTag ? metaTag.content : '';
+
+                // Check if key is configured
+                if (!publishableKey || publishableKey === 'pk_test_YOUR_CLERK_KEY_HERE') {
+                    console.warn('Clerk publishable key not configured. Authentication disabled.');
+                    // Show app without auth for development
+                    showMainApp();
+                    return;
+                }
+
+                // Load Clerk script
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
+                script.crossOrigin = 'anonymous';
+                script.setAttribute('data-clerk-publishable-key', publishableKey);
+                script.onload = function() {
+                    if (window.Clerk) {
+                        window.Clerk.load().then(initClerk);
+                    }
+                };
+                script.onerror = function() {
+                    console.error('Failed to load Clerk script');
+                    showMainApp(); // Fallback: show app without auth
+                };
+                document.head.appendChild(script);
+            }
+
+            // Wait for Clerk to initialize
+            async function initClerk() {
+                // Wait for Clerk to be available
+                if (!window.Clerk) {
+                    // Retry after a short delay
+                    setTimeout(initClerk, 100);
+                    return;
+                }
+
+                try {
+                    // Wait for Clerk to finish loading
+                    await window.Clerk.load();
+
+                    if (window.Clerk.user) {
+                        // User is signed in - show main app
+                        showMainApp();
+
+                        // Get and store the auth token
+                        const token = await window.Clerk.session.getToken();
+                        window.clerkToken = token;
+
+                        // Mount user button
+                        const userButtonEl = document.getElementById('user-button');
+                        if (userButtonEl) {
+                            window.Clerk.mountUserButton(userButtonEl);
+                        }
+                    } else {
+                        // User not signed in - show auth container
+                        showAuthContainer();
+                    }
+
+                    // Listen for auth state changes
+                    window.Clerk.addListener(async ({ user }) => {
+                        if (user) {
+                            // User signed in
+                            const token = await window.Clerk.session.getToken();
+                            window.clerkToken = token;
+                            showMainApp();
+                            window.location.reload(); // Reload to reinitialize with auth
+                        } else {
+                            // User signed out
+                            window.clerkToken = null;
+                            showAuthContainer();
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Clerk initialization error:', error);
+                    // Show auth container on error (will prompt sign in)
+                    showAuthContainer();
+                }
+            }
+
+            function showAuthContainer() {
+                authContainer.style.display = 'flex';
+                mainApp.style.display = 'none';
+
+                // Mount sign-in component
+                const signInEl = document.getElementById('clerk-sign-in');
+                if (signInEl && window.Clerk && window.Clerk.mountSignIn) {
+                    window.Clerk.mountSignIn(signInEl, {
+                        appearance: {
+                            elements: {
+                                rootBox: { boxShadow: 'none' },
+                                card: { boxShadow: 'none' }
+                            }
+                        }
+                    });
+                }
+            }
+
+            function showMainApp() {
+                authContainer.style.display = 'none';
+                mainApp.style.display = 'block';
+            }
+
+            // Initialize Clerk when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadClerkScript);
+            } else {
+                loadClerkScript();
+            }
+
+            // Show iframe when loaded
+            iframe.addEventListener('load', function() {
+                loading.style.display = 'none';
+                iframe.style.display = 'block';
+
+                // Inject mobile CSS into iframe if possible
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const link = iframeDoc.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = '/static/mobile-responsive.css';
+                    iframeDoc.head.appendChild(link);
+                } catch (e) {
+                    console.warn('Could not inject styles into iframe:', e);
+                }
+            });
+
+            // Handle menu toggle on mobile
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        const tracePanel = iframeDoc.querySelector('.trace-panel, .side-panel, mat-drawer');
+                        const overlay = iframeDoc.querySelector('.mobile-overlay') || createOverlay(iframeDoc);
+
+                        if (tracePanel) {
+                            tracePanel.classList.toggle('mobile-visible');
+                            tracePanel.classList.toggle('open');
+                            overlay.classList.toggle('active');
+                        }
+                    } catch (e) {
+                        console.warn('Could not toggle trace panel:', e);
+                    }
+                });
+            }
+
+            // Create overlay element
+            function createOverlay(doc) {
+                const overlay = doc.createElement('div');
+                overlay.className = 'mobile-overlay';
+                overlay.addEventListener('click', function() {
+                    const tracePanel = doc.querySelector('.trace-panel.mobile-visible');
+                    if (tracePanel) {
+                        tracePanel.classList.remove('open');
+                        overlay.classList.remove('active');
+                    }
+                });
+                doc.body.appendChild(overlay);
+                return overlay;
+            }
+
+            // Prevent zoom on double-tap (iOS)
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+
+            // Handle viewport height on mobile (accounts for address bar)
+            function setVH() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            setVH();
+            window.addEventListener('resize', setVH);
+            window.addEventListener('orientationchange', setVH);
+
+            // Add active class to body on mobile
+            if (window.innerWidth <= 768) {
+                document.body.classList.add('mobile-device');
+            }
+
+            // Monitor orientation
+            window.addEventListener('orientationchange', function() {
+                // Refresh after orientation change
+                setTimeout(setVH, 100);
+            });
+        })();
+    </script>
+</body>
+</html>
