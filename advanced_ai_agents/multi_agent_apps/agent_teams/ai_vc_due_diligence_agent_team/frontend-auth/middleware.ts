@@ -12,9 +12,8 @@ export default clerkMiddleware(async (auth, request) => {
     // If not authenticated, redirect to sign-in
     if (!userId) {
       const url = new URL(request.url)
-      const signInUrl = new URL('/sign-in', url.origin)
-      signInUrl.searchParams.set('redirect_url', url.pathname)
-      return Response.redirect(signInUrl.toString())
+      const redirectPath = url.pathname
+      return Response.redirect(new URL(`/sign-in?redirect_url=${encodeURIComponent(redirectPath)}`, url.origin))
     }
 
     // Check if user's email domain is allowed
