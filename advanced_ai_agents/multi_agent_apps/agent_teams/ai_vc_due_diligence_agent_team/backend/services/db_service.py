@@ -20,7 +20,8 @@ async def initialize_db_pool():
 
     database_url = os.getenv("DATABASE_URL")
     if not database_url:
-        raise ValueError("DATABASE_URL environment variable is not set")
+        logger.warning("DATABASE_URL not set - database features disabled")
+        return
 
     logger.info(f"Initializing database connection pool")
 

@@ -1,0 +1,46 @@
+# Railway Configuration for VC Due Diligence Agent Team
+# Multi-service deployment with Frontend (ADK), Backend (API), and PostgreSQL
+
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Frontend service (ADK Web UI with Mobile CSS)
+[[services]]
+name = "frontend"
+dockerfile = "frontend/Dockerfile"
+
+  [services.environment]
+  PORT = "8080"
+  HOST = "0.0.0.0"
+  ADK_FORCE_LOCAL_STORAGE = "0"
+
+  [services.healthcheck]
+  path = "/"
+  interval = 30
+  timeout = 10
+
+# Backend service (FastAPI)
+[[services]]
+name = "backend"
+dockerfile = "backend/Dockerfile"
+
+  [services.environment]
+  PORT = "8000"
+  HOST = "0.0.0.0"
+  ENVIRONMENT = "production"
+  LOG_LEVEL = "INFO"
+
+  [services.healthcheck]
+  path = "/api/health"
+  interval = 30
+  timeout = 10
+
+# PostgreSQL database (managed by Railway)
+[[services]]
+name = "postgres"
+type = "database"
+engine = "postgresql"
