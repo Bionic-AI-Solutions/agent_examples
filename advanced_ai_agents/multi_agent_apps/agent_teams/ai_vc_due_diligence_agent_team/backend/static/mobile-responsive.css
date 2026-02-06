@@ -1,0 +1,285 @@
+/**
+ * Mobile-Responsive Styles for ADK VC Due Diligence Agent
+ *
+ * This stylesheet makes the chat interface prominent on mobile devices
+ * while minimizing the left-hand trace information panel.
+ */
+
+/* Mobile-first responsive breakpoints */
+:root {
+  --mobile-breakpoint: 768px;
+  --tablet-breakpoint: 1024px;
+}
+
+/* Mobile styles (0-768px) */
+@media only screen and (max-width: 768px) {
+
+  /* Hide or minimize left panel (trace information) on mobile */
+  .mat-drawer-container .mat-drawer,
+  .side-panel,
+  .trace-panel,
+  .trace-tree,
+  .trace-detail,
+  [class*="trace"],
+  [class*="side-panel"],
+  mat-drawer.mat-drawer-side {
+    display: none !important;
+  }
+
+  /* Make chat panel full width */
+  .mat-drawer-content,
+  .chat-panel,
+  .chat-container,
+  .main-content,
+  adk-chat-panel,
+  [class*="chat-panel"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Ensure chat takes full screen */
+  .mat-drawer-container {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Chat messages full width */
+  .message-card,
+  .chat-message,
+  .user-message,
+  .bot-message,
+  [class*="message"] {
+    max-width: 100% !important;
+    margin: 8px 0 !important;
+    padding: 12px !important;
+  }
+
+  /* Input area styling for mobile */
+  .chat-input,
+  .input-field,
+  .message-input,
+  textarea[placeholder*="message"],
+  [class*="input"] {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 12px !important;
+    width: 100% !important;
+  }
+
+  /* Send button mobile optimization */
+  .send-button,
+  button[aria-label*="send"],
+  .mat-mdc-mini-fab {
+    min-width: 44px !important;
+    min-height: 44px !important; /* Touch-friendly size */
+  }
+
+  /* Hide unnecessary UI elements on mobile */
+  .toolbar-extras,
+  .session-list,
+  .artifact-tab:not(.active),
+  .breadcrumb,
+  [class*="toolbar"] .mat-icon:not(.menu-icon) {
+    display: none !important;
+  }
+
+  /* Mobile-friendly toolbar */
+  .toolbar,
+  .chat-toolbar,
+  [class*="toolbar"] {
+    height: 56px !important;
+    padding: 8px 16px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Add hamburger menu for trace (if needed) */
+  .mobile-menu-toggle {
+    display: block !important;
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 1000;
+    background: var(--builder-button-primary-background-color);
+    color: var(--builder-button-primary-text-color);
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  /* Slide-out trace panel (hidden by default) */
+  .trace-panel.mobile-visible {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 80vw;
+    max-width: 300px;
+    background: var(--builder-panel-background-color);
+    z-index: 999;
+    overflow-y: auto;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .trace-panel.mobile-visible.open {
+    transform: translateX(0);
+  }
+
+  /* Overlay when trace panel is open */
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+
+  .mobile-overlay.active {
+    display: block;
+  }
+
+  /* Stack vertically on mobile */
+  .mat-tab-group,
+  .tab-container {
+    flex-direction: column !important;
+  }
+
+  /* Mobile-friendly tabs */
+  .mat-tab-label {
+    min-width: auto !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+  }
+
+  /* Compact spacing on mobile */
+  .mat-expansion-panel,
+  .expansion-panel {
+    margin: 4px 0 !important;
+  }
+
+  /* Ensure body doesn't overflow */
+  body {
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Chat container takes full height */
+  .chat-container,
+  adk-chat-panel {
+    height: calc(100vh - 56px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Messages area is scrollable */
+  .messages-container,
+  .chat-messages,
+  [class*="messages"] {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px !important;
+  }
+
+  /* Input area sticks to bottom */
+  .input-container,
+  .chat-input-container,
+  [class*="input-container"] {
+    flex: 0 0 auto !important;
+    padding: 8px !important;
+    background: var(--chat-panel-message-textarea-background-color);
+    border-top: 1px solid var(--builder-border-color);
+  }
+}
+
+/* Tablet styles (769px-1024px) */
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+
+  /* Reduce left panel width on tablet */
+  .mat-drawer-container .mat-drawer,
+  .side-panel,
+  .trace-panel {
+    width: 200px !important;
+    min-width: 200px !important;
+  }
+
+  /* Chat takes remaining space */
+  .mat-drawer-content,
+  .chat-panel {
+    margin-left: 200px !important;
+    width: calc(100% - 200px) !important;
+  }
+}
+
+/* Desktop styles (1025px+) */
+@media only screen and (min-width: 1025px) {
+
+  /* Default desktop layout - no changes needed */
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+}
+
+/* Utility classes */
+.mobile-only {
+  display: none !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .mobile-only {
+    display: block !important;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+/* Accessibility improvements for mobile */
+@media only screen and (max-width: 768px) {
+
+  /* Larger touch targets */
+  button,
+  a,
+  .clickable,
+  [role="button"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  /* Better readability */
+  .message-text,
+  .chat-text,
+  p {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Prevent text resize on orientation change */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+/* Handle notch/safe areas on modern mobile devices */
+@supports (padding: env(safe-area-inset-top)) {
+  @media only screen and (max-width: 768px) {
+    .toolbar,
+    .chat-toolbar {
+      padding-top: calc(8px + env(safe-area-inset-top)) !important;
+    }
+
+    .input-container,
+    .chat-input-container {
+      padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+    }
+  }
+}

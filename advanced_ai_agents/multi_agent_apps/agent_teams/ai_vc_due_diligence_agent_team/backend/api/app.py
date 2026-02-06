@@ -1,7 +1,10 @@
 """FastAPI Application Setup - VC Due Diligence API"""
 
+from pathlib import Path
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from loguru import logger
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
@@ -73,10 +76,19 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(research_router)
 
-# Root endpoint
+# Static files directory (frontend/static served from backend)
+_static_dir = Path(__file__).parent.parent / "static"
+if _static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
+
+
+# Root endpoint - serve Clerk auth page
 @app.get("/", include_in_schema=False)
 async def root():
-    """Root endpoint redirect to docs"""
+    """Serve the Clerk authentication / chat interface page"""
+    index_file = _static_dir / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
     return {
         "message": "VC Due Diligence API",
         "docs": "/api/docs",
