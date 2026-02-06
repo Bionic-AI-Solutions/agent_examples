@@ -11,9 +11,9 @@ export default clerkMiddleware(async (auth, request) => {
 
     // If not authenticated, redirect to sign-in
     if (!userId) {
-      const url = new URL(request.url)
-      const redirectPath = url.pathname
-      return Response.redirect(new URL(`/sign-in?redirect_url=${encodeURIComponent(redirectPath)}`, url.origin))
+      const url = request.nextUrl
+      const signInUrl = `${url.origin}/sign-in?redirect_url=${encodeURIComponent(url.pathname)}`
+      return Response.redirect(signInUrl)
     }
 
     // Check if user's email domain is allowed
@@ -23,7 +23,7 @@ export default clerkMiddleware(async (auth, request) => {
       const emailDomain = email.split('@')[1]
       if (!ALLOWED_DOMAINS.includes(emailDomain)) {
         // Redirect to unauthorized page
-        return Response.redirect(new URL('/unauthorized', request.url))
+        return Response.redirect(`${request.nextUrl.origin}/unauthorized`)
       }
     }
   }
